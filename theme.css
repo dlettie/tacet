@@ -16,18 +16,18 @@
   --accent-s: 68%;
   --accent-l: 57%;
 
-  --background-primary: #fcfbff;
-  --background-primary-alt: #f5f4fa;
-  /* Darkened relative to before so the card visibly lifts off the
-     app background instead of nearly matching it. */
-  --background-secondary: #e4e3ed;
-  --background-secondary-alt: #d8d7e4;
+  /* Warm the near-white surfaces slightly and keep the workspace/card
+     separation distinct without the stark white-to-gray jump. */
+  --background-primary: #f1eff4;
+  --background-primary-alt: #e2e0e8;
+  --background-secondary: #c7c5cf;
+  --background-secondary-alt: #bdbbc6;
 
   --text-normal: #252432;
   --text-muted: #686779;
   --text-faint: #9291a3;
 
-  --background-sidebar: #f0eff6;
+  --background-sidebar: #dcd9e3;
   --setting-button-bg: var(--background-secondary);
   --setting-button-hover: var(--background-secondary-alt);
   --setting-button-border: rgba(45, 42, 79, 0.16);
