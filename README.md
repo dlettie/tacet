@@ -1,6 +1,6 @@
 # Tacet
 
-A workspace focused on minimizing distractions without sacrificing aesthetic.
+An Obsidian theme focused on minimizing distractions without sacrificing aesthetic.
 
 ## Previews
 
