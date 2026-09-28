@@ -1,0 +1,597 @@
+/* My Theme
+   A minimal accent-color theme layered on top of Obsidian's defaults.
+   Overrides accent color, surface shades, fonts, and border radius
+   for both light and dark appearance.
+
+   Obsidian's core CSS appears to load in a higher-priority cascade
+   layer than theme CSS — normal-weight declarations here lose to
+   core's normal-weight declarations regardless of selector
+   specificity or source order (confirmed experimentally: identical
+   rules only took effect once !important was added). So every
+   structural rule below that needs to actually win is !important.
+*/
+
+.theme-light {
+  --accent-h: 252;
+  --accent-s: 68%;
+  --accent-l: 57%;
+
+  --background-primary: #fcfbff;
+  --background-primary-alt: #f5f4fa;
+  /* Darkened relative to before so the card visibly lifts off the
+     app background instead of nearly matching it. */
+  --background-secondary: #e4e3ed;
+  --background-secondary-alt: #d8d7e4;
+
+  --text-normal: #252432;
+  --text-muted: #686779;
+  --text-faint: #9291a3;
+
+  --background-sidebar: #f0eff6;
+  --setting-button-bg: var(--background-secondary);
+  --setting-button-hover: var(--background-secondary-alt);
+  --setting-button-border: rgba(45, 42, 79, 0.16);
+}
+
+.theme-dark {
+  /* Colors follow the Atom theme (kognise/obsidian-atom), which is
+     based on Atom's One Dark. */
+  --accent-h: 219;
+  --accent-s: 56%;
+  --accent-l: 55%;
+
+  /* One Dark palette, used by callouts, tags, and code highlighting. */
+  --color-red: #e06c75;
+  --color-orange: #d19a66;
+  --color-yellow: #e5c07b;
+  --color-green: #98c379;
+  --color-cyan: #56b6c2;
+  --color-blue: #61afef;
+  --color-purple: #c678dd;
+
+  /* Editor card is the lightest surface, sidebar cards sit one step
+     darker, and the workspace gap behind them is darkest. A black
+     shadow has little headroom against the dark gap, so the lift
+     comes mainly from the border highlight and surface difference. */
+  --background-primary: #272b34;
+  --background-primary-alt: #20242b;
+  --background-secondary: #1a1e24;
+  --background-secondary-alt: #1a1e24;
+  --background-modifier-border: #424958;
+  --background-modifier-hover: hsla(var(--accent-h), calc(var(--accent-s) - 35%), var(--accent-l), 0.06);
+  --background-sidebar: var(--background-primary-alt);
+
+  --text-normal: #dcddde;
+  --text-muted: #888888;
+  /* Atom's comment gray; a touch brighter than Atom's own faint text
+     so the card borders (mixed from this color) stay visible. */
+  --text-faint: #5c6370;
+  --text-accent: var(--color-blue);
+  --text-accent-hover: #70bdfc;
+  --text-error: #e16d76;
+  --text-selection: rgba(0, 122, 255, 0.2);
+
+  --interactive-normal: var(--background-primary-alt);
+  --interactive-hover: #353b47;
+
+  --setting-button-bg: var(--interactive-hover);
+  --setting-button-hover: #3e4451;
+  --setting-button-border: rgba(171, 178, 191, 0.16);
+
+  --tag-color: var(--color-yellow);
+  --tag-color-hover: var(--color-yellow);
+  --tag-background: var(--background-primary-alt);
+  --tag-background-hover: var(--background-primary-alt);
+
+  --code-background: var(--background-primary-alt);
+  --code-normal: #abb2bf;
+  --code-comment: var(--text-faint);
+  --code-function: var(--color-blue);
+  --code-important: var(--color-orange);
+  --code-keyword: var(--color-purple);
+  --code-operator: var(--color-cyan);
+  --code-property: var(--color-red);
+  --code-punctuation: var(--code-normal);
+  --code-string: var(--color-green);
+  --code-tag: var(--color-red);
+  --code-value: var(--color-orange);
+
+  /* Dark surfaces need a stronger, more opaque shadow than light
+     ones to read at all — the default --shadow-s below all but
+     disappears against a dark gap color. */
+  --shadow-s: rgba(0, 0, 0, 0.6) 0px 16px 32px -6px,
+    rgba(0, 0, 0, 0.55) 0px 8px 16px -4px,
+    rgba(0, 0, 0, 0.3) 0px 2px 4px 0px;
+}
+
+:root {
+  --font-text: "Inter", var(--font-default);
+  --font-interface: "Inter", var(--font-default);
+  --font-monospace: "JetBrains Mono", var(--font-monospace-theme, monospace);
+
+  --radius-s: 4px !important;
+  --radius-m: 999px !important;
+  --radius-l: 18px !important;
+
+  /* Baseline theme's squircle corner shape and diffuse, low-opacity
+     drop shadow, applied to our own floating panels below. */
+  --corner-shape: superellipse(1.1);
+  --shadow-s: rgba(0, 0, 0, 0.08) 0px 12px 24px -4px,
+    rgba(0, 0, 0, 0.04) 0px 8px 16px -4px;
+}
+
+/* Card insets and outline, shared by the editor, the side splits and
+   the left ribbon so their edges line up at any window size. The top
+   inset is the extra gap between a tab row and its card, used by the
+   editor too (.workspace-tabs gap below) so all cards start level. The
+   tab pills already sit centered in a --header-height row, so 0 still
+   leaves a small gap under them. */
+body {
+  /* Taller tab row (Obsidian default 40px). Everything that sits below
+     it — editor, sidebar cards, and the ribbon (via its margin-top) —
+     moves down with it. */
+  --header-height: 46px !important;
+  /* One fixed height for editor tabs, sidebar tabs and the new-tab
+     button, so they always match regardless of text vs icon size. */
+  --tab-pill-height: 32px;
+  /* Space between editor tabs, and between the last tab and the
+     new-tab button. */
+  --tab-gap: 6px;
+  --sidebar-card-inset-top: 0px;
+  --sidebar-card-inset-bottom: var(--size-4-3);
+  /* A faint light edge does the work a dark shadow can't on a dark
+     background — it's what actually separates the card from the
+     gap when both are already low-lightness. */
+  --card-edge-color: color-mix(in srgb, var(--text-faint) 18%, transparent);
+  --card-border: 1px solid var(--card-edge-color);
+}
+
+/* Slightly softer heading weight */
+.markdown-rendered h1,
+.markdown-rendered h2,
+.markdown-rendered h3 {
+  font-weight: 650;
+}
+
+/* Give text buttons in Settings a distinct surface from the panel. */
+.vertical-tab-content .setting-item-control button:not(.clickable-icon):not(.color-picker-button):not(.mod-warning):not(.mod-cta) {
+  background-color: var(--setting-button-bg) !important;
+  border: 1px solid var(--setting-button-border) !important;
+  color: var(--text-normal) !important;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.vertical-tab-content .setting-item-control button:not(.clickable-icon):not(.color-picker-button):not(.mod-warning):not(.mod-cta):hover {
+  background-color: var(--setting-button-hover) !important;
+}
+
+.vertical-tab-content .setting-item-control button:not(.clickable-icon):not(.color-picker-button):not(.mod-warning):not(.mod-cta):focus-visible {
+  outline: 2px solid var(--interactive-accent) !important;
+  outline-offset: 2px;
+}
+
+/* Cards/panes pick up the rounded corners */
+.modal,
+.suggestion-container {
+  border-radius: var(--radius-l) !important;
+  corner-shape: var(--corner-shape);
+}
+
+/* The workspace supplies the secondary-colored backdrop behind the
+   rounded editor and sidebar cards. */
+.app-container,
+.horizontal-main-container,
+.workspace {
+  background-color: var(--background-secondary) !important;
+}
+
+/* Keep a compact gutter around the editor while leaving room for its
+   shadow to show against the workspace background. No top padding: the
+   tab row sits in the traffic-light row, level with the sidebar tabs. */
+.workspace-split.mod-root {
+  background-color: transparent !important;
+  /* Equal side gaps, so the editor sits the same distance from both
+     sidebar cards. */
+  padding: 0 6px var(--size-4-3) !important;
+  border-left: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+/* Give the sidebars the same bottom inset as the editor so their panes
+   line up as cards across the full workspace height. Like the editor,
+   their tab rows sit in the traffic-light row (Obsidian already pads
+   that row to clear the traffic lights); the top inset goes between the
+   tab row and the card instead, as the tab container's margin-top. */
+.workspace-split.mod-left-split,
+.workspace-split.mod-right-split {
+  box-sizing: border-box !important;
+  background-color: transparent !important;
+  padding-top: 0 !important;
+  padding-bottom: var(--sidebar-card-inset-bottom) !important;
+  border: none !important;
+  overflow: visible !important;
+}
+
+/* The left sidebar card is drawn by two real elements stacked flush:
+   the tab container (top, sides, rounded top-right corner) and the
+   vault profile below it (sides, bottom, rounded bottom-right corner).
+   The left edge is left open so the card joins the ribbon. */
+.workspace-split.mod-left-split .workspace-sidedock-vault-profile {
+  display: flex !important;
+  box-sizing: border-box !important;
+  background-color: var(--background-sidebar) !important;
+  border: var(--card-border) !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-radius: 0 0 var(--radius-l) 0 !important;
+  corner-shape: var(--corner-shape);
+  margin: 0 !important;
+}
+
+/* Gap between multiple editor panes when the root split is divided */
+.workspace-split.mod-root.mod-vertical,
+.workspace-split.mod-root.mod-horizontal,
+.workspace-split.mod-root .mod-vertical,
+.workspace-split.mod-root .mod-horizontal {
+  gap: 6px !important;
+}
+
+/* Tab bar and editor content as two separate floating cards,
+   with a clear gap between them (not touching, like Baseline). */
+.workspace-split.mod-root .workspace-tabs {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: var(--sidebar-card-inset-top) !important;
+  border-radius: var(--radius-l) !important;
+  overflow: visible !important;
+}
+
+/* No boxed bar behind the tabs — each tab floats free on the app
+   background as its own pill, and the sidebar tab rows stay on the
+   same surface as the sidebar card. */
+.workspace-split.mod-root .workspace-tab-header-container,
+.mod-left-split .workspace-tab-header-container,
+.mod-right-split .workspace-tab-header-container {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+}
+
+/* Center the pills in the row (no default 6px top margin), level with
+   the traffic lights and the sidebar tab icons. */
+.workspace-split.mod-root .workspace-tab-header-container-inner {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--tab-gap) !important;
+  padding: 0 !important;
+  /* Core uses negative side margins here, which would pull the first
+     tab past the card's edge. */
+  margin: 0 !important;
+}
+
+/* Start the first tab flush with the editor card's left edge. Skipped
+   for the top-left pane when the left sidebar is collapsed, where
+   Obsidian pads the row to clear the macOS traffic lights. */
+.workspace-split.mod-root .workspace-tabs:not(.mod-top-left-space) .workspace-tab-header-container {
+  padding-left: 0 !important;
+}
+
+/* Tab pills fill the shared --tab-pill-height with content centered,
+   so editor tabs, sidebar tabs and the new-tab button all match and
+   end the same distance above the cards. */
+.workspace-split.mod-root .workspace-tab-header,
+.mod-left-split .workspace-tab-header,
+.mod-right-split .workspace-tab-header {
+  --tab-radius-active: var(--radius-m);
+  border-radius: var(--radius-m) !important;
+  box-shadow: none !important;
+  border: none !important;
+  height: var(--tab-pill-height) !important;
+}
+
+.workspace-split.mod-root .workspace-tab-header {
+  --tab-outline-width: 0px;
+  background-color: var(--background-sidebar) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.mod-left-split .workspace-tab-header,
+.mod-right-split .workspace-tab-header {
+  background-color: transparent !important;
+}
+
+.workspace-split.mod-root .workspace-tab-header-inner,
+.mod-left-split .workspace-tab-header-inner,
+.mod-right-split .workspace-tab-header-inner {
+  box-sizing: border-box !important;
+  height: 100% !important;
+  align-items: center !important;
+}
+
+.workspace-split.mod-root .workspace-tab-header-inner {
+  margin-bottom: 0 !important;
+  padding: 0 12px !important;
+}
+
+.mod-left-split .workspace-tab-header-inner,
+.mod-right-split .workspace-tab-header-inner {
+  padding: 0 8px !important;
+}
+
+/* Obsidian draws the tab fill on ::before; match the header surface
+   too so both layers use the sidebar color at their rounded edges. */
+.workspace-split.mod-root .workspace-tab-header::before {
+  background-color: var(--background-sidebar) !important;
+  border-radius: var(--radius-m) !important;
+}
+
+.workspace-split.mod-root .workspace-tab-header.is-active,
+.workspace-split.mod-root .workspace-tab-header.is-active::before {
+  box-shadow: none !important;
+  outline: none !important;
+  clip-path: none !important;
+  mask: none !important;
+}
+
+.mod-left-split .workspace-tab-header.is-active,
+.mod-right-split .workspace-tab-header.is-active {
+  background-color: var(--background-modifier-hover) !important;
+}
+
+.workspace-split.mod-root .workspace-tab-header-spacer,
+.workspace-split.mod-root .workspace-tab-header-status-container {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Match the "new tab" (+) button to the tab pills: a square box at
+   the shared --tab-pill-height, icon centered. Scoped to the main
+   editor tabs only — the sidebar's own "+" should stay a plain,
+   unboxed icon. */
+.workspace-split.mod-root .workspace-tab-header-new-tab {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  box-sizing: border-box !important;
+  height: var(--tab-pill-height) !important;
+  width: var(--tab-pill-height) !important;
+  padding: 0 !important;
+  margin: 0 0 0 var(--tab-gap) !important;
+  background-color: var(--background-primary) !important;
+  border-radius: var(--radius-m) !important;
+}
+
+/* Strip the inner clickable-icon's own padding/margin so the outer
+   box above is the only thing sizing and coloring this button —
+   otherwise it doubles up and throws off centering. */
+.workspace-split.mod-root .workspace-tab-header-new-tab .clickable-icon {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Put the left toggle's right edge flush with the sidebar card's right
+   edge: no offset, and no right padding on it or its tab row. */
+body .sidebar-toggle-button.mod-left {
+  position: relative !important;
+  left: 0 !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+
+.mod-left-split .workspace-tab-header-container {
+  padding-right: 0 !important;
+}
+
+/* On macOS, Obsidian pins the right toggle to the window's top-right
+   corner with a solid titlebar-colored box (--background-secondary-alt
+   when focused), which shows as a lighter patch on the backdrop. */
+.sidebar-toggle-button.mod-right {
+  background-color: transparent !important;
+}
+
+/* Join the left ribbon visually to the sidebar surface. */
+.workspace-ribbon.mod-left,
+.workspace-ribbon.mod-left .side-dock-actions,
+.workspace-ribbon.mod-left .side-dock-settings {
+  background-color: var(--background-sidebar) !important;
+  border-right: none !important;
+  box-shadow: none !important;
+}
+
+/* Align the ribbon with the sidebar card. Obsidian already offsets the
+   ribbon by --header-height (the sidebar tab row); add the same insets
+   the sidebar split uses so the top and bottom edges meet the card. */
+.workspace-ribbon.mod-left {
+  border: var(--card-border) !important;
+  box-sizing: border-box !important;
+  margin-top: calc(var(--header-height) + var(--sidebar-card-inset-top)) !important;
+  margin-bottom: var(--sidebar-card-inset-bottom) !important;
+  align-self: stretch !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+/* Round the ribbon's exposed right edge only while the left sidebar
+   is collapsed. */
+body:has(.workspace-split.mod-left-split.is-sidedock-collapsed) .workspace-ribbon.mod-left {
+  border-top-right-radius: var(--radius-l) !important;
+  border-bottom-right-radius: var(--radius-l) !important;
+  overflow: hidden !important;
+}
+
+/* Invisible resize handles between panes. */
+hr.workspace-leaf-resize-handle,
+.workspace-split.mod-left-split hr.workspace-leaf-resize-handle::before,
+.workspace-split.mod-left-split hr.workspace-leaf-resize-handle::after,
+.workspace-split.mod-right-split hr.workspace-leaf-resize-handle::before,
+.workspace-split.mod-right-split hr.workspace-leaf-resize-handle::after {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+hr.workspace-leaf-resize-handle {
+  border-color: transparent !important;
+}
+
+/* Obsidian's core CSS puts `contain: strict !important` on
+   .workspace-leaf (for render performance) — paint containment
+   clips an element's OWN box-shadow to its border box, and being
+   !important, nothing here can turn it off. So the shadow has to
+   live one level up, on .workspace-tab-container (the leaf's
+   wrapper), which core only gives plain `overflow: hidden` —
+   that doesn't clip an element's own shadow. Content clipping
+   (the sticky properties/tag row) still needs to happen down on
+   .workspace-leaf itself, below. */
+.workspace-split.mod-root .workspace-tab-container,
+.workspace-split.mod-left-split .workspace-tab-container,
+.workspace-split.mod-right-split .workspace-tab-container {
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+/* Every card (editor and side panes, their wrapper and leaf) gets
+   the same rounded squircle corners.
+
+   On the leaf, overflow: hidden (not clip-path) so the corner actually
+   renders with corner-shape's squircle, matching the tab container —
+   clip-path's `round` syntax only does plain circular corners and
+   doesn't know about corner-shape, which made the bottom corners
+   (governed by clip-path) visibly less rounded than the top ones
+   (governed by tab-container's real border-radius). If a sticky
+   properties/tag row bleeds a square background past this on scroll
+   (a known Chromium quirk with overflow: hidden + sticky descendants),
+   clip it individually instead of reverting this to clip-path for the
+   whole card. */
+.workspace-split.mod-root .workspace-tab-container,
+.workspace-split.mod-left-split .workspace-tab-container,
+.workspace-split.mod-right-split .workspace-tab-container,
+.workspace-split.mod-root .workspace-leaf,
+.workspace-split.mod-left-split .workspace-leaf,
+.workspace-split.mod-right-split .workspace-leaf {
+  border-radius: var(--radius-l) !important;
+  corner-shape: var(--corner-shape);
+}
+
+.workspace-split.mod-root .workspace-leaf,
+.workspace-split.mod-left-split .workspace-leaf,
+.workspace-split.mod-right-split .workspace-leaf {
+  overflow: hidden !important;
+}
+
+.workspace-split.mod-root .workspace-tab-container {
+  margin-top: 0 !important;
+  background-color: var(--background-primary) !important;
+  border: var(--card-border) !important;
+}
+
+/* Side panes use the same card treatment as the editor. */
+.workspace-split.mod-left-split .workspace-tab-container,
+.workspace-split.mod-right-split .workspace-tab-container {
+  margin-top: var(--sidebar-card-inset-top) !important;
+}
+
+.workspace-split.mod-left-split .workspace-tab-container,
+.workspace-split.mod-right-split .workspace-tab-container,
+.workspace-split.mod-left-split .workspace-leaf,
+.workspace-split.mod-right-split .workspace-leaf,
+.workspace-split.mod-left-split .workspace-leaf-content,
+.workspace-split.mod-right-split .workspace-leaf-content {
+  background-color: var(--background-sidebar) !important;
+}
+
+/* Top half of the left sidebar card (see the vault profile rule for
+   the bottom half): square on the ribbon side, open at the bottom so
+   it runs straight into the vault profile. */
+.workspace-split.mod-left-split .workspace-tab-container {
+  border: var(--card-border) !important;
+  border-bottom: none !important;
+  border-left: none !important;
+}
+
+.workspace-split.mod-left-split .workspace-tab-container,
+.workspace-split.mod-left-split .workspace-leaf {
+  border-radius: 0 var(--radius-l) 0 0 !important;
+}
+
+/* Notebook Navigator paints its panes from its own theme variables,
+   so align both its navigation and file-list surfaces with the sidebar,
+   and draw its dividers (e.g. under the pinned shortcuts) in the same
+   faint color as the sidebar card's edge. */
+.workspace-split.mod-left-split .nn-split-container {
+  --nn-theme-nav-bg: var(--background-sidebar) !important;
+  --nn-theme-list-bg: var(--background-sidebar) !important;
+  --nn-theme-mobile-bg: var(--background-sidebar) !important;
+  --nn-theme-divider-border-color: var(--card-edge-color) !important;
+}
+
+/* Obsidian draws small connector "notches" (corner shapes meant to
+   blend a tab or card into content sitting flush below it) and
+   leftover tab-divider lines on these pseudo-elements. Our tabs and
+   cards float with gaps instead, so these show as stray squares and
+   lines — remove them all. The left-side tab notch is drawn by a
+   separate container-level pseudo-element (used to slide a connector
+   under whichever tab is active), not the per-tab one. */
+.workspace-split.mod-root .workspace-tab-header.is-active::after,
+.mod-left-split .workspace-tab-header.is-active::after,
+.mod-right-split .workspace-tab-header.is-active::after,
+.workspace-split.mod-root .workspace-tab-header-container-inner::before,
+.workspace-split.mod-root .workspace-tab-header-container-inner::after,
+.mod-left-split .workspace-tab-header-container-inner::before,
+.mod-left-split .workspace-tab-header-container-inner::after,
+.mod-right-split .workspace-tab-header-container-inner::before,
+.mod-right-split .workspace-tab-header-container-inner::after,
+.workspace-split.mod-root .workspace-tab-header-inner::before,
+.workspace-split.mod-root .workspace-tab-header-inner::after,
+.workspace-split.mod-root .workspace-tab-container::before,
+.workspace-split.mod-root .workspace-tab-container::after,
+.workspace-split.mod-root .workspace-leaf::before,
+.workspace-split.mod-root .workspace-leaf::after,
+.workspace-split.mod-left-split .workspace-tab-container::before,
+.workspace-split.mod-left-split .workspace-tab-container::after,
+.workspace-split.mod-left-split .workspace-leaf::before,
+.workspace-split.mod-left-split .workspace-leaf::after,
+.workspace-split.mod-right-split .workspace-tab-container::before,
+.workspace-split.mod-right-split .workspace-tab-container::after,
+.workspace-split.mod-right-split .workspace-leaf::before,
+.workspace-split.mod-right-split .workspace-leaf::after,
+.workspace-ribbon.mod-left::before,
+.workspace-ribbon.mod-left::after {
+  display: none !important;
+  content: none !important;
+}
+
+.status-bar {
+  display: none !important;
+}
+
+/* Show the vault switcher as a plain row at the bottom of the sidebar
+   card; the vault profile around it supplies the card's edge. */
+.workspace-drawer-vault-switcher {
+  display: flex !important;
+  box-sizing: border-box !important;
+  border: none !important;
+}
+
+/* Keep the Settings action beside the vault switcher, but hide
+   Help/About (Obsidian renders Help first, then Settings). */
+.workspace-drawer-vault-actions {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.workspace-drawer-vault-actions > .clickable-icon:first-child {
+  display: none !important;
+}
+
+/* Position the command palette near the top of the screen when opened. */
+.prompt {
+  top: 10% !important;
+}
