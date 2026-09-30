@@ -394,10 +394,11 @@ body .sidebar-toggle-button.mod-left {
   background-color: transparent !important;
 }
 
-/* Join the left ribbon visually to the sidebar surface. */
-.workspace-ribbon.mod-left,
-.workspace-ribbon.mod-left .side-dock-actions,
-.workspace-ribbon.mod-left .side-dock-settings {
+/* Join the left ribbon visually to the sidebar surface. Newer Obsidian
+   builds tag it .mod-primary instead of .mod-left, so match both. */
+.workspace-ribbon:is(.mod-left, .mod-primary),
+.workspace-ribbon:is(.mod-left, .mod-primary) .side-dock-actions,
+.workspace-ribbon:is(.mod-left, .mod-primary) .side-dock-settings {
   background-color: var(--background-sidebar) !important;
   border-right: none !important;
   box-shadow: none !important;
@@ -406,7 +407,7 @@ body .sidebar-toggle-button.mod-left {
 /* Align the ribbon with the sidebar card. Obsidian already offsets the
    ribbon by --header-height (the sidebar tab row); add the same insets
    the sidebar split uses so the top and bottom edges meet the card. */
-.workspace-ribbon.mod-left {
+.workspace-ribbon:is(.mod-left, .mod-primary) {
   border: var(--card-border) !important;
   box-sizing: border-box !important;
   margin-top: calc(var(--header-height) + var(--sidebar-card-inset-top)) !important;
@@ -418,7 +419,7 @@ body .sidebar-toggle-button.mod-left {
 
 /* Round the ribbon's exposed right edge only while the left sidebar
    is collapsed. */
-body:has(.workspace-split.mod-left-split.is-sidedock-collapsed) .workspace-ribbon.mod-left {
+body:has(.workspace-split.mod-left-split.is-sidedock-collapsed) .workspace-ribbon:is(.mod-left, .mod-primary) {
   border-top-right-radius: var(--radius-l) !important;
   border-bottom-right-radius: var(--radius-l) !important;
   overflow: hidden !important;
@@ -562,8 +563,8 @@ hr.workspace-leaf-resize-handle {
 .workspace-split.mod-right-split .workspace-tab-container::after,
 .workspace-split.mod-right-split .workspace-leaf::before,
 .workspace-split.mod-right-split .workspace-leaf::after,
-.workspace-ribbon.mod-left::before,
-.workspace-ribbon.mod-left::after {
+.workspace-ribbon:is(.mod-left, .mod-primary)::before,
+.workspace-ribbon:is(.mod-left, .mod-primary)::after {
   display: none !important;
   content: none !important;
 }
